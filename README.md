@@ -18,4 +18,3 @@ How to run (Windows / VS Code):
 
 Notes:
 - MSW is started automatically in dev mode. All data is persisted in your browser's IndexedDB.
-- This prototype focuses on core functionality and is intentionally compact. You can extend components in `src/pages` and `src` as needed.
