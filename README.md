@@ -76,5 +76,4 @@ Please be aware of the following limitations inherent to the prototype environme
 
 * **No Backend Dependency:** Data persistence is strictly limited to **browser storage (IndexedDB)**. **Refreshing or resetting the browser may lead to data loss** depending on the Dexie configuration.
 * **API Mocking Setup:** Proper functioning of API mocks relies on the correct **service worker registration** in development. Production environments would require a different, dedicated backend solution.
-* **Browser Compatibility:** IndexedDB support and performance can vary across **older or less-common browsers**.
 * **Port Conflicts:** The default Vite development port is **`5173`**. If this port is occupied, you may need to update the configuration in `vite.config.js`.
