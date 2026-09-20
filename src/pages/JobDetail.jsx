@@ -1,266 +1,280 @@
-import React, { useEffect, useState, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useMemo } from 'react'
+import { useParams, Link } from 'react-router-dom'
 import { 
-    Box, 
-    Typography, 
-    Chip, 
-    Paper, 
-    Divider, 
-    useTheme, 
-    alpha,
+  Box, 
+  Container,
+  Typography, 
+  Chip, 
+  Paper, 
+  Divider, 
+  Button,
+  IconButton,
+  Tooltip,
 } from '@mui/material'
-
-// --- Mock Data Function for Job Detail ---
-const mockFetchJobDetail = (id) => {
-    const mockJobs = [
-        { 
-            id: '1', 
-            title: 'Senior Frontend Developer', 
-            status: 'active', 
-            slug: 'senior-frontend-developer', 
-            tags: ['react', 'typescript', 'remote', 'senior'],
-            description: "We are seeking a seasoned frontend developer to lead our primary customer-facing application. Must have deep expertise in **React and state management** (Redux/MobX). This role involves mentorship and ensuring high performance across all modern browsers. Fully remote position with flexible hours.",
-            department: 'Engineering',
-            hiringManager: 'Alice Johnson',
-            postedDate: new Date(Date.now() - 86400000 * 15),
-            applicants: 42,
-        },
-        { 
-            id: '2', 
-            title: 'Lead Data Scientist', 
-            status: 'active', 
-            slug: 'lead-data-scientist', 
-            tags: ['python', 'ml', 'ai', 'leader', 'tensorflow'],
-            description: "The Data Science team needs a leader to design and implement **machine learning models** (Deep Learning, NLP) to optimize our core business metrics. You will be responsible for the entire model lifecycle, from research and experimentation using **Python/TensorFlow** to production deployment.",
-            department: 'Data & Analytics',
-            hiringManager: 'Bob Smith',
-            postedDate: new Date(Date.now() - 86400000 * 30),
-            applicants: 15,
-        },
-        { 
-            id: '3', 
-            title: 'UX/UI Designer', 
-            status: 'archived', 
-            slug: 'ux-ui-designer', 
-            tags: ['figma', 'sketch', 'design', 'user-research'],
-            description: "This position focused on translating complex requirements into simple, beautiful user interfaces. Responsibilities included **conducting user research**, creating **Figma/Sketch prototypes**, and maintaining our design system. This listing is currently **Archived**.",
-            department: 'Product',
-            hiringManager: 'Charlie Brown',
-            postedDate: new Date(Date.now() - 86400000 * 60),
-            applicants: 0,
-        },
-        { 
-            id: '4', 
-            title: 'Junior Backend Engineer', 
-            status: 'active', 
-            slug: 'junior-backend-engineer', 
-            tags: ['node', 'express', 'sql', 'entry-level', 'rest-api'],
-            description: "An excellent **entry-level** opportunity to join our team, focusing on building and maintaining scalable backend services in **Node.js/Express**. You will work with both **SQL** and NoSQL databases, implementing robust **RESTful APIs** under senior guidance.",
-            department: 'Engineering',
-            hiringManager: 'Alice Johnson',
-            postedDate: new Date(Date.now() - 86400000 * 5),
-            applicants: 68,
-        },
-        { 
-            id: '5', 
-            title: 'DevOps Specialist', 
-            status: 'active', 
-            slug: 'devops-specialist', 
-            tags: ['aws', 'kubernetes', 'ci/cd', 'terraform', 'docker'],
-            description: "Seeking an expert to manage and automate our cloud infrastructure on **AWS**. Key responsibilities include designing and maintaining **CI/CD pipelines** (Jenkins/GitLab), managing **Kubernetes** clusters, and implementing Infrastructure as Code using **Terraform**.",
-            department: 'Operations',
-            hiringManager: 'Dana Scully',
-            postedDate: new Date(Date.now() - 86400000 * 20),
-            applicants: 31,
-        },
-        { 
-            id: '6', 
-            title: 'Technical Writer', 
-            status: 'active', 
-            slug: 'technical-writer', 
-            tags: ['documentation', 'markdown', 'api-docs', 'confluence'],
-            description: "Create clear, concise, and user-friendly documentation for our APIs and software products. Must be proficient in **Markdown**, experienced with version control (Git), and able to collaborate with engineering teams to simplify complex technical concepts.",
-            department: 'Product',
-            hiringManager: 'Fox Mulder',
-            postedDate: new Date(Date.now() - 86400000 * 10),
-            applicants: 18,
-        },
-        { 
-            id: '7', 
-            title: 'Product Manager', 
-            status: 'archived', 
-            slug: 'product-manager', 
-            tags: ['agile', 'scrum', 'roadmap', 'jira'],
-            description: "This role focused on defining the product vision, strategy, and **roadmap**. Responsibilities included managing the **Scrum backlog**, prioritizing features, and ensuring alignment between engineering and business goals. This listing is currently **Archived**.",
-            department: 'Product',
-            hiringManager: 'Eve Harrington',
-            postedDate: new Date(Date.now() - 86400000 * 45),
-            applicants: 5,
-        },
-    ];
-    // Match ID format (string from useParams)
-    return mockJobs.find((x) => String(x.id) === String(id)) || null;
-};
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline'
+import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined'
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline'
+import ArchiveIcon from '@mui/icons-material/Archive'
+import UnarchiveIcon from '@mui/icons-material/Unarchive'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import { useTalent } from '../context/TalentContext'
 
 export default function JobDetail() {
-    const { id } = useParams();
-    const [job, setJob] = useState(null);
-    const theme = useTheme();
+  const { id } = useParams()
+  const { jobs, candidates, toggleJobStatus } = useTalent()
 
-    useEffect(() => {
-        // Simulate an asynchronous fetch delay
-        const timer = setTimeout(() => {
-            const foundJob = mockFetchJobDetail(id);
-            setJob(foundJob);
-        }, 300); // 300ms delay for a realistic loading feel
+  const job = useMemo(() => {
+    return jobs.find((j) => String(j.id) === String(id)) || null
+  }, [jobs, id])
 
-        return () => clearTimeout(timer); // Cleanup timer
-    }, [id]);
+  const jobCandidates = useMemo(() => {
+    return candidates.filter((c) => String(c.jobId) === String(id))
+  }, [candidates, id])
 
-    // Helper to get status colors
-    const getStatusColor = useMemo(() => {
-        const isActive = job?.status === 'active';
-        return {
-            main: isActive ? theme.palette.success.main : theme.palette.warning.main,
-            text: isActive ? theme.palette.success.dark : theme.palette.warning.dark,
-            background: isActive ? alpha(theme.palette.success.light, 0.2) : alpha(theme.palette.warning.light, 0.2),
-        };
-    }, [job?.status, theme]);
-
-
-    if (!job) {
-        return (
-            <Box sx={{ maxWidth: 900, mx: 'auto', p: { xs: 2, md: 4 }, bgcolor: theme.palette.grey[50], minHeight: '100vh' }}>
-                <Paper elevation={3} sx={{ p: 4, mt: 5, textAlign: 'center', borderRadius: 3 }}>
-                    <Typography variant="h5" color="text.secondary">
-                        {/* Show a loading state until the timeout is complete */}
-                        {job === null ? `Loading job details for ID: ${id}...` : 'Job not found.'}
-                    </Typography>
-                </Paper>
-            </Box>
-        );
-    }
-
+  if (!job) {
     return (
-        <Box sx={{ maxWidth: 900, mx: 'auto', p: { xs: 2, md: 4 }, bgcolor: theme.palette.grey[50], minHeight: '100vh' }}>
-            
-            {/* Header Block */}
-            <Paper 
-                elevation={6} 
-                sx={{ 
-                    p: 4, 
-                    mb: 4, 
-                    borderRadius: 3, 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    bgcolor: theme.palette.common.white,
-                    boxShadow: `0 8px 30px ${alpha(theme.palette.primary.main, 0.15)}`
+      <Container maxWidth="sm" sx={{ py: 10, textAlign: 'center' }}>
+        <Paper elevation={0} sx={{ p: 5, borderRadius: 2, border: '1px solid #E4E4E7', bgcolor: '#FFFFFF' }}>
+          <Typography variant="h6" fontWeight={700} color="#09090B" gutterBottom>
+            Requisition Not Found
+          </Typography>
+          <Typography variant="body2" color="#71717A" sx={{ mb: 3 }}>
+            The requested requisition #{id} could not be located or has been deleted.
+          </Typography>
+          <Button component={Link} to="/jobs" variant="contained" startIcon={<ArrowBackIcon />}>
+            Back to Requisitions
+          </Button>
+        </Paper>
+      </Container>
+    )
+  }
+
+  const isActive = job.status === 'active'
+  const pipeline = job.pipeline || { applied: 0, screen: 0, interview: 0, offer: 0, hired: 0 }
+
+  return (
+    <Container maxWidth="xl">
+      <Button
+        component={Link}
+        to="/jobs"
+        startIcon={<ArrowBackIcon sx={{ fontSize: 16 }} />}
+        sx={{ mb: 3, color: '#71717A', '&:hover': { color: '#09090B' } }}
+      >
+        Back to Requisitions
+      </Button>
+
+      {/* Header Requisition Card */}
+      <Paper elevation={0} sx={{ p: { xs: 3, md: 4 }, borderRadius: 2, border: '1px solid #E4E4E7', bgcolor: '#FFFFFF', mb: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { md: 'flex-start' }, gap: 2.5 }}>
+          <Box sx={{ flexGrow: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap', mb: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: 700, letterSpacing: '-0.03em', color: '#09090B' }}>
+                {job.title}
+              </Typography>
+              <Chip
+                label={isActive ? 'Active Requisition' : 'Archived'}
+                sx={{
+                  height: 24,
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  bgcolor: isActive ? '#09090B' : '#F4F4F5',
+                  color: isActive ? '#FAFAFA' : '#71717A',
+                  borderRadius: 1,
                 }}
-            >
-                <Box>
-                    <Typography variant="h3" sx={{ fontWeight: 800, color: theme.palette.primary.dark, mb: 1 }}>
-                        {job.title}
-                    </Typography>
-                    <Typography variant="h6" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                        /{job.slug}
-                    </Typography>
-                </Box>
-                
-                {/* Status Chip */}
+              />
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, flexWrap: 'wrap', color: '#71717A', fontSize: '0.875rem', mb: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <BusinessCenterOutlinedIcon sx={{ fontSize: 16 }} />
+                <Typography variant="body2">{job.department}</Typography>
+              </Box>
+              <Typography variant="body2" sx={{ color: '#D4D4D8' }}>•</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <LocationOnOutlinedIcon sx={{ fontSize: 16 }} />
+                <Typography variant="body2">{job.location}</Typography>
+              </Box>
+              <Typography variant="body2" sx={{ color: '#D4D4D8' }}>•</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <PersonOutlineIcon sx={{ fontSize: 16 }} />
+                <Typography variant="body2">Hiring Lead: {job.hiringLead}</Typography>
+              </Box>
+            </Box>
+
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+              {job.tags?.map((tag) => (
                 <Chip
-                    label={job.status === 'active' ? 'ACTIVE LISTING' : 'ARCHIVED'}
-                    sx={{
-                        textTransform: 'uppercase',
-                        fontWeight: 700,
-                        fontSize: '1rem',
-                        height: '40px',
-                        padding: '0 16px',
-                        backgroundColor: getStatusColor.main,
-                        color: theme.palette.common.white,
-                    }}
+                  key={tag}
+                  label={tag}
+                  size="small"
+                  sx={{
+                    bgcolor: '#FAFAFA',
+                    border: '1px solid #E4E4E7',
+                    color: '#52525B',
+                    fontSize: '0.725rem',
+                    borderRadius: 1,
+                  }}
                 />
-            </Paper>
+              ))}
+            </Box>
+          </Box>
 
-            {/* Main Content: Details and Description */}
-            <Paper 
-                elevation={3} 
-                sx={{ 
-                    p: 4, 
-                    borderRadius: 3, 
-                    bgcolor: theme.palette.common.white 
-                }}
+          {/* Action Toolbar */}
+          <Box sx={{ display: 'flex', gap: 1.5, alignSelf: { xs: 'flex-start', md: 'center' } }}>
+            <Button
+              variant="outlined"
+              onClick={() => toggleJobStatus(job.id)}
+              startIcon={isActive ? <ArchiveIcon sx={{ fontSize: 16 }} /> : <UnarchiveIcon sx={{ fontSize: 16 }} />}
+              sx={{ color: '#09090B', borderColor: '#E4E4E7', borderRadius: 1.5 }}
             >
-                {/* Key Metrics Grid */}
-                <Box sx={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr 1fr' }, 
-                    gap: 3, 
-                    mb: 3, 
-                    pb: 3,
-                    borderBottom: `1px solid ${theme.palette.divider}`
-                }}>
-                    {/* Item: Department */}
-                    <Box>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>Department</Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 700 }}>{job.department || 'N/A'}</Typography>
-                    </Box>
-                    
-                    {/* Item: Hiring Manager */}
-                    <Box>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>Hiring Manager</Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 700 }}>{job.hiringManager || 'Unassigned'}</Typography>
-                    </Box>
-                    
-                    {/* Item: Applicants */}
-                    <Box>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>Applicants</Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>{job.applicants !== undefined ? job.applicants : 'N/A'}</Typography>
-                    </Box>
-
-                    {/* Item: Posted Date */}
-                    <Box>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 600 }}>Posted Date</Typography>
-                        <Typography variant="body1" sx={{ fontWeight: 600 }}>{job.postedDate ? job.postedDate.toLocaleDateString() : 'N/A'}</Typography>
-                    </Box>
-                </Box>
-                
-                {/* Tags Section */}
-                <Box sx={{ mb: 4 }}>
-                    <Typography variant="h6" sx={{ mb: 1, fontWeight: 700, color: theme.palette.primary.main }}>
-                        Required Skills / Tags
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {job.tags?.map((t) => (
-                            <Chip 
-                                key={t} 
-                                label={t} 
-                                size="medium"
-                                sx={{
-                                    fontWeight: 600,
-                                    textTransform: 'capitalize',
-                                    backgroundColor: alpha(theme.palette.info.light, 0.5),
-                                    color: theme.palette.info.dark,
-                                }}
-                            />
-                        ))}
-                    </Box>
-                </Box>
-                
-                <Divider sx={{ mb: 3 }} />
-
-                {/* Description Section */}
-                <Box>
-                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 700, color: theme.palette.primary.main }}>
-                        Job Description
-                    </Typography>
-                    <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', color: theme.palette.text.primary }}>
-                        {job.description || 'No detailed description provided for this job listing.'}
-                    </Typography>
-                </Box>
-
-            </Paper>
+              {isActive ? 'Archive Requisition' : 'Activate Requisition'}
+            </Button>
+            <Button
+              component={Link}
+              to="/candidates"
+              variant="contained"
+              endIcon={<ArrowForwardIcon sx={{ fontSize: 16 }} />}
+              sx={{ borderRadius: 1.5 }}
+            >
+              View Candidate Directory
+            </Button>
+          </Box>
         </Box>
-    );
+      </Paper>
+
+      {/* Grid: Description & Pipeline Stats */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' }, gap: 3 }}>
+        {/* Left Column: Scope & Associated Candidates */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: '1px solid #E4E4E7', bgcolor: '#FFFFFF' }}>
+            <Typography variant="h6" fontWeight={700} color="#09090B" gutterBottom>
+              Role Specification & Scope
+            </Typography>
+            <Typography variant="body1" color="#3F3F46" sx={{ lineHeight: 1.7, mb: 3 }}>
+              {job.description}
+            </Typography>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="subtitle2" fontWeight={600} color="#09090B" gutterBottom>
+              Core Responsibilities
+            </Typography>
+            <Box component="ul" sx={{ pl: 2.5, m: 0, color: '#52525B', fontSize: '0.9rem', lineHeight: 1.8 }}>
+              <li>Lead key architectural decisions and collaborate with cross-functional leads.</li>
+              <li>Maintain high engineering standards through structured evaluations and design reviews.</li>
+              <li>Champion accessibility, zero-downtime releases, and low-latency operational efficiency.</li>
+            </Box>
+          </Paper>
+
+          {/* Candidates mapped to this role */}
+          <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: '1px solid #E4E4E7', bgcolor: '#FFFFFF' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" fontWeight={700} color="#09090B">
+                Candidates in Pipeline ({jobCandidates.length})
+              </Typography>
+              <Button component={Link} to="/candidates" size="small" sx={{ color: '#09090B', fontWeight: 600 }}>
+                View All
+              </Button>
+            </Box>
+            <Divider sx={{ mb: 2 }} />
+
+            {jobCandidates.length === 0 ? (
+              <Typography variant="body2" color="#71717A" sx={{ py: 2, textAlign: 'center' }}>
+                No candidates currently mapped to this requisition.
+              </Typography>
+            ) : (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                {jobCandidates.map((c) => (
+                  <Paper
+                    key={c.id}
+                    elevation={0}
+                    component={Link}
+                    to={`/candidates/${c.id}`}
+                    sx={{
+                      p: 2,
+                      borderRadius: 1.5,
+                      border: '1px solid #E4E4E7',
+                      bgcolor: '#FAFAFA',
+                      textDecoration: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      transition: 'all 0.15s ease',
+                      '&:hover': {
+                        bgcolor: '#FFFFFF',
+                        borderColor: '#A1A1AA',
+                      },
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="subtitle2" fontWeight={600} color="#09090B">
+                        {c.name}
+                      </Typography>
+                      <Typography variant="caption" color="#71717A">
+                        {c.email} • Rating: {c.rating} / 5.0
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={c.stage}
+                      size="small"
+                      sx={{
+                        textTransform: 'uppercase',
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        bgcolor: '#09090B',
+                        color: '#FAFAFA',
+                        borderRadius: 1,
+                      }}
+                    />
+                  </Paper>
+                ))}
+              </Box>
+            )}
+          </Paper>
+        </Box>
+
+        {/* Right Column: Live Pipeline Velocity */}
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 2, border: '1px solid #E4E4E7', bgcolor: '#FFFFFF', height: 'fit-content' }}>
+          <Typography variant="h6" fontWeight={700} color="#09090B" gutterBottom>
+            Stage Distribution
+          </Typography>
+          <Typography variant="body2" color="#71717A" sx={{ mb: 3 }}>
+            Real-time applicant progression through candidate evaluation gates.
+          </Typography>
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {[
+              { stage: 'Applied', count: pipeline.applied, color: '#D4D4D8' },
+              { stage: 'Screen', count: pipeline.screen, color: '#A1A1AA' },
+              { stage: 'Interview', count: pipeline.interview, color: '#71717A' },
+              { stage: 'Offer', count: pipeline.offer, color: '#27272A' },
+              { stage: 'Hired', count: pipeline.hired, color: '#09090B' },
+            ].map((st) => (
+              <Box key={st.stage}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                  <Typography variant="caption" fontWeight={600} color="#09090B">
+                    {st.stage}
+                  </Typography>
+                  <Typography variant="caption" fontWeight={700} color="#09090B">
+                    {st.count}
+                  </Typography>
+                </Box>
+                <Box sx={{ height: 6, borderRadius: 3, bgcolor: '#F4F4F5', overflow: 'hidden' }}>
+                  <Box
+                    sx={{
+                      height: '100%',
+                      width: `${Math.min(100, Math.max(8, (st.count / (job.applicantsCount || 1)) * 100))}%`,
+                      bgcolor: st.color,
+                      borderRadius: 3,
+                    }}
+                  />
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Paper>
+      </Box>
+    </Container>
+  )
 }
