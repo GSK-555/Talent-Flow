@@ -1,79 +1,136 @@
-# 🌟 TalentFlow Prototype
+# 🌟 TalentFlow
 
-A modern, high-performance frontend prototype for **TalentFlow**, a hiring management tool. Built with **Vite** and **React**, this prototype features a robust component library (**Material UI**), client-side routing, advanced UI interactions (drag-and-drop, virtualization), and browser-based data persistence via **IndexedDB**.
+A modern, high-performance applicant tracking and talent management web application built with **React 18**, **Vite**, and **Material-UI (MUI v5)**.
+
+TalentFlow streamlines the modern recruitment lifecycle—from job requisition management and interactive Kanban candidate pipelines to customizable structured hiring assessments.
+
+---
 
 ## 🚀 Quick Start
 
-Follow these simple steps to get the TalentFlow prototype running on your local machine.
+Follow these steps to run TalentFlow locally on your machine.
 
 ### Prerequisites
 
-Ensure you have the following installed:
+Ensure you have installed:
+* **Node.js** (v18 or newer recommended)
+* **npm** (comes packaged with Node.js)
 
-* **Node.js** (v18+)
-* **npm**
+### Installation & Development
 
-### Setup Instructions
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/GSK-555/Talent-Flow.git
+   cd Talent-Flow
+   ```
 
-1.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-2.  **Run the app in development mode:**
-    The app will typically run on **`http://localhost:5173`**.
-    ```bash
-    npm run dev
-    ```
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+   Open your browser and navigate to **`http://localhost:5173`**.
 
 ### Production Commands
 
 | Command | Description |
 | :--- | :--- |
-| `npm run build` | Builds the app for production to the `dist` folder. |
-| `npm run preview` | Serves the production build locally for testing. |
+| `npm run dev` | Runs the Vite dev server with Hot Module Replacement (HMR). |
+| `npm run build` | Bundles and minifies the application for production into `dist/`. |
+| `npm run preview` | Locally serves and previews the production build output. |
 
 ---
 
-## 🛠️ Architecture and Stack
+## 🛠️ Architecture & Tech Stack
 
-The prototype leverages a modern, performance-focused stack to deliver a fast and scalable user experience.
+TalentFlow uses a modular, component-driven architecture designed for responsive UI, seamless data flow, and fast client-side navigation.
 
-| Category | Tool / Library | Purpose |
+| Category | Technology | Purpose |
 | :--- | :--- | :--- |
-| **Framework** | **React** (v18) | Core UI library for building dynamic user interfaces. |
-| **Build/Tooling** | **Vite** | Fast development server and build tool with quick HMR (Hot Module Replacement). |
-| **UI/Styling** | **Material UI (MUI)** | Comprehensive component library and design system for rapid UI development. |
-| **Styling Engine** | **Emotion** | High-performance CSS-in-JS library. |
-| **Routing** | **React Router** (v6) | Handles declarative client-side navigation. |
-| **Data Persistence** | **Dexie.js** (IndexedDB) | Scalable, browser-based data storage for offline/local persistence. |
-| **API Mocking** | **Mock Service Worker (MSW)** | Intercepts network requests to mock API responses client-side. |
-
-### Key Technical Decisions
-
-* **Vite + React:** Chosen over alternatives like CRA for superior **startup time** and lightning-fast **HMR**, streamlining the development loop.
-* **Material UI:** Enables **rapid prototyping** with a vast library of prebuilt, customizable components and a familiar, professional design language.
-* **IndexedDB (Dexie.js):** Provides **scalable client-side persistence**, making it ideal for prototypes that need robust local storage capabilities and potential offline interactions.
-* **MSW for API Mocking:** Decouples frontend and backend development, allowing the team to iterate quickly on the UI independently and facilitating robust **unit/integration testing**.
+| **Framework** | [React 18](https://react.dev/) | Core UI library for declarative, reactive interfaces. |
+| **Build & Tooling** | [Vite](https://vitejs.dev/) | High-speed frontend build tool and HMR dev server. |
+| **Design System & UI** | [Material UI (MUI v5)](https://mui.com/) + Emotion | Design system, layout components, and custom design tokens. |
+| **Routing** | [React Router v6](https://reactrouter.com/) | Client-side declarative routing and URL parameter management. |
+| **Data Architecture** | React Context API + LocalStorage + [Dexie.js](https://dexie.com/) | Centralized talent store with IndexedDB client-side persistence. |
+| **Drag & Drop** | [react-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd) | Drag-and-drop Kanban pipeline boards. |
+| **List Virtualization** | [react-window](https://github.com/bvaughn/react-window) | Virtualized window rendering for candidate lists. |
+| **API Mocking** | [Mock Service Worker (MSW)](https://mswjs.io/) | Client-side service worker intercepting mock endpoints. |
+| **Utility** | [uuid](https://github.com/uuidjs/uuid) | Secure, collision-resistant unique ID generation. |
 
 ---
 
-## ✨ Features
+## ✨ Core Application Features
 
-This prototype includes several advanced features to demonstrate a rich user experience:
+### 1. 💼 Jobs Management
+* **Job Directory**: Filter jobs by status (`Active`, `Archived`), department, location, or search keyword.
+* **Pipeline Metrics**: Visual breakdown of candidate progression across hiring stages for each role.
+* **Job Requisition Creation**: Modal dialog for creating new job postings with custom tags, hiring leads, and descriptions.
+* **Archive / Reactivate / Delete**: Complete lifecycle management for job requisitions.
 
-* **Interactive Drag-and-Drop:** Implemented using `react-beautiful-dnd` for managing candidates/jobs across stages.
-* **High-Performance Views:** **Virtualized lists/views** powered by `react-window` ensure smooth rendering and interaction even with large datasets.
-* **State Management:** Utilizes a standard React approach combined with persistence hooks.
-* **Unique IDs:** Uses the `uuid` library for reliable, unique resource identification.
-* **Client-Side Mocking:** All API requests are intercepted and handled client-side via MSW.
+### 2. 👥 Candidate Management & Pipeline
+* **Kanban Pipeline Board**: Visual drag-and-drop board across key stages:
+  * `Applied` ➔ `Screening` ➔ `Interview` ➔ `Offer` ➔ `Hired` (or `Archived`)
+* **List & Grid Views**: Toggle between high-density list and visual card grid views with status chips and rating indicators.
+* **Deep Filtering & Search**: Instant real-time filtering by candidate name, target role, stage, rating, and tags.
+* **Candidate Detail Profiles**: Timeline logs, assessment submissions, interviewer feedback notes, and contact details.
+
+### 3. 📝 Structured Assessments & Evaluations
+* **Role-Based Assessments**: Configurable assessments per job role with timed durations, pass criteria, and difficulty levels.
+* **Assessment Builder**: Create custom assessments with multiple question types (Multiple Choice, Code Challenge, System Design).
+* **Candidate Submissions & Grading**: Review submitted evaluations, verify passing scores, and leave reviewer feedback.
+
+### 4. 🎨 Design & Experience
+* **Custom Enterprise Theme**: Tailored typography (Inter font family), modern gradients, glassmorphism app bar, and responsive layout.
+* **Persistent State**: Seamless browser persistence for mock records so changes persist across page reloads.
 
 ---
 
-## ⚠️ Known Issues and Warnings
+## 📁 Project Structure
 
-Please be aware of the following limitations inherent to the prototype environment:
+```
+Talent-Flow/
+├── public/
+│   └── mockServiceWorker.js     # MSW service worker for API mocking
+├── src/
+│   ├── context/
+│   │   └── TalentContext.jsx    # Centralized state provider for jobs, candidates & assessments
+│   ├── db/
+│   │   └── index.js             # Dexie.js IndexedDB schema and client-side database
+│   ├── mocks/
+│   │   ├── browser.js           # MSW worker initialization
+│   │   └── handlers.js          # REST API request handlers & endpoints
+│   ├── pages/
+│   │   ├── Jobs.jsx             # Job listings, search, filter, and creation
+│   │   ├── JobDetail.jsx        # Detailed job view and candidate stage breakdown
+│   │   ├── Candidates.jsx       # Candidate directory and Kanban board
+│   │   ├── CandidateDetail.jsx  # Candidate profile, notes, and assessment history
+│   │   └── Assessments.jsx      # Assessment dashboard, creation, and submissions
+│   ├── App.jsx                  # Main application component, navigation, and router
+│   ├── main.jsx                 # Application root with service worker bootstrap
+│   ├── styles.css               # Global CSS resets and custom scrollbars
+│   └── theme.js                 # Custom Material UI theme configuration
+├── index.html                   # HTML template
+├── package.json                 # Project dependencies and npm scripts
+├── vite.config.js               # Vite bundler configuration
+└── .gitignore                   # Git ignore patterns for dependencies, builds, and logs
+```
 
-* **No Backend Dependency:** Data persistence is strictly limited to **browser storage (IndexedDB)**. **Refreshing or resetting the browser may lead to data loss** depending on the Dexie configuration.
-* **API Mocking Setup:** Proper functioning of API mocks relies on the correct **service worker registration** in development. Production environments would require a different, dedicated backend solution.
-* **Port Conflicts:** The default Vite development port is **`5173`**. If this port is occupied, you may need to update the configuration in `vite.config.js`.
+---
+
+## 🤝 Contributing
+
+1. Fork the project.
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your changes (`git commit -m "Add some AmazingFeature"`).
+4. Push to the branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
